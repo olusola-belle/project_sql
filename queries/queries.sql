@@ -37,3 +37,49 @@ UNION ALL
 
  SELECT 'offices' AS table_name, 9 AS number_of_attributes, COUNT(*) AS number_of_rows
    FROM offices;
+
+   -- Compute the low stock for top ten products
+
+SELECT productCode,
+       ROUND(SUM(quantityOrdered * 1.0) / 
+       (SELECT quantityInStock 
+          FROM products AS p
+         WHERE od.productCode = p.productCode), 2) AS low_stock
+  FROM orderdetails AS od
+ GROUP BY productCode
+ ORDER BY low_stock DESC
+ LIMIT 10;
+
+ -- Compute the performance for top ten products
+
+SELECT productCode, SUM(quantityOrdered * priceEach) AS                        product_performance
+  FROM orderdetails
+ GROUP BY productCode
+ ORDER BY product_performance DESC
+ LIMIT 10;
+
+-- Compute priority products for restocking
+
+WITH  low_stock_table AS (
+  SELECT productCode,
+       ROUND(SUM(quantityOrdered * 1.0) / 
+       (SELECT quantityInStock 
+          FROM products AS p
+         WHERE od.productCode = p.productCode), 2) AS low_stock
+  FROM orderdetails AS od
+ GROUP BY productCode
+ ORDER BY low_stock DESC
+ LIMIT 10),
+    
+products_to_restock AS (
+
+SELECT productCode, SUM(quantityOrdered * priceEach) AS                        product_performance
+  FROM orderdetails
+ GROUP BY productCode
+ ORDER BY product_performance DESC
+ LIMIT 10)
+ 
+SELECT productCode, productLine, productName
+  FROM products AS p
+ WHERE productCode IN (SELECT productCode
+                         FROM products_to_restock);
