@@ -108,7 +108,7 @@ SELECT o.customerNumber, SUM(quantityOrdered * (priceEach -
  GROUP BY o.customerNumber
 )
  
-SELECT cr.profit, c.contactLastName, c.contactFirstName,                        c.city,c.country
+SELECT cr.profit, c.contactLastName, c.contactFirstName,c.city,c.country
   FROM customers AS c
   JOIN customers_by_revenue AS cr
     ON c.customerNumber = cr.customerNumber
@@ -129,9 +129,25 @@ SELECT o.customerNumber, ROUND(SUM(quantityOrdered * (priceEach -
  GROUP BY o.customerNumber
 )
  
-SELECT c.contactLastName, c.contactFirstName,                                  c.city,c.country, cr.revenue
+SELECT c.contactLastName, c.contactFirstName, c.city,c.country, cr.revenue
   FROM customers AS c
   JOIN customers_by_revenue AS cr
     ON c.customerNumber = cr.customerNumber
  ORDER BY cr.revenue 
  LIMIT 5;
+
+ -- Calculate the customer lifetime value
+WITH 
+customers_by_revenue AS (
+SELECT o.customerNumber, ROUND(SUM(quantityOrdered * (priceEach - 
+       buyPrice)) ,2) AS revenue
+  FROM products p
+  JOIN orderdetails od
+    ON p.productCode = od.productCode
+  JOIN orders o
+    ON o.orderNumber = od.orderNumber
+ GROUP BY o.customerNumber
+)
+
+SELECT AVG(revenue) AS lifetime_value
+  FROM customers_by_revenue;
