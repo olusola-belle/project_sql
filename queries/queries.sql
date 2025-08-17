@@ -73,7 +73,7 @@ WITH  low_stock_table AS (
     
 products_to_restock AS (
 
-SELECT productCode, SUM(quantityOrdered * priceEach) AS                        product_performance
+SELECT productCode, SUM(quantityOrdered * priceEach) AS product_performance
   FROM orderdetails
  GROUP BY productCode
  ORDER BY product_performance DESC
@@ -85,10 +85,53 @@ SELECT productCode, productLine, productName
                          FROM products_to_restock);
  
  -- Categorize customers by revenue
-SELECT o.customerNumber, SUM(quantityOrdered * (priceEach -                      buyPrice)) AS profit
+SELECT o.customerNumber, SUM(quantityOrdered * (priceEach - buyPrice)) AS revenue
   FROM orders AS o
  INNER JOIN orderdetails AS od
     ON o.orderNumber = od.orderNumber
  INNER JOIN products AS p
     ON od.productCode = p.productCode
  GROUP BY o.customerNumber;                        
+
+
+-- Categorize the top five VIP customers
+WITH 
+
+customers_by_revenue AS (
+SELECT o.customerNumber, SUM(quantityOrdered * (priceEach - 
+       buyPrice)) AS revenue
+  FROM products p
+  JOIN orderdetails od
+    ON p.productCode = od.productCode
+  JOIN orders o
+    ON o.orderNumber = od.orderNumber
+ GROUP BY o.customerNumber
+)
+ 
+SELECT cr.profit, c.contactLastName, c.contactFirstName,                        c.city,c.country
+  FROM customers AS c
+  JOIN customers_by_revenue AS cr
+    ON c.customerNumber = cr.customerNumber
+ ORDER BY cr.profit DESC
+ LIMIT 5;
+
+ -- Categorize the top five least  customers
+WITH 
+
+customers_by_revenue AS (
+SELECT o.customerNumber, ROUND(SUM(quantityOrdered * (priceEach - 
+       buyPrice)) ,2) AS revenue
+  FROM products p
+  JOIN orderdetails od
+    ON p.productCode = od.productCode
+  JOIN orders o
+    ON o.orderNumber = od.orderNumber
+ GROUP BY o.customerNumber
+)
+ 
+SELECT c.contactLastName, c.contactFirstName,                                  c.city,c.country, cr.revenue
+  FROM customers AS c
+  JOIN customers_by_revenue AS cr
+    ON c.customerNumber = cr.customerNumber
+ ORDER BY cr.revenue 
+ LIMIT 5;
