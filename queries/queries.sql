@@ -84,7 +84,7 @@ SELECT productCode, productLine, productName
  WHERE productCode IN (SELECT productCode
                          FROM products_to_restock);
  
- -- Categorize most profitable and less engaged customers
+ -- Categorize customers by revenue
 SELECT o.customerNumber, SUM(quantityOrdered * (priceEach -                      buyPrice)) AS profit
   FROM orders AS o
  INNER JOIN orderdetails AS od
