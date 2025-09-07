@@ -22,6 +22,33 @@ This aim of the projects was to answer the following questions:
 - Question 3: How much can we spend on acquiring new customers?
 
 Question 1: Which products should we order more of or less of?
+```sql
+-- Compute priority products for restocking
+WITH  low_stock_table AS (
+  SELECT productCode,
+       ROUND(SUM(quantityOrdered * 1.0) / 
+       (SELECT quantityInStock 
+          FROM products AS p
+         WHERE od.productCode = p.productCode), 2) AS low_stock
+  FROM orderdetails AS od
+ GROUP BY productCode
+ ORDER BY low_stock DESC
+ LIMIT 10),
+    
+products_to_restock AS (
+
+SELECT productCode, SUM(quantityOrdered * priceEach) AS product_performance
+  FROM orderdetails
+ GROUP BY productCode
+ ORDER BY product_performance DESC
+ LIMIT 10)
+ 
+SELECT productCode, productLine, productName
+  FROM products AS p
+ WHERE productCode IN (SELECT productCode
+                         FROM products_to_restock);
+```                         
+
 From the analysis, vintage cars and motorcycles sold more, since they sell frequently they should be prioritized for restocking.
 
 | productCode | productLine | productName |
