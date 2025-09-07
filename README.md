@@ -153,7 +153,7 @@ SELECT AVG(revenue) AS lifetime_value
 |39039.5943877551
 - When a customer's lifetime value (CLV) is 39,039.59, it means that — based on the underlying data and assumptions — a single customer is expected to generate $39,039.59 in revenue or profit for the business over the full course of their relationship. If the business has ten of such customers, the total expected value to the business would be approximately 390,395.90, highlighting the significant impact that even a small number of high-value customers can have on overall business performance.
 
-Conclusion: 
+### Conclusion: 
 This analysis provided key insights to support strategic decision-making in product inventory, customer engagement, and customer acquisition spending. Based on sales data, **vintage cars and motorcycles** are top-performing products and should be prioritized for restocking. Customer segmentation revealed VIP customers who contribute significantly to revenue, suggesting that targeted marketing and personalized communication strategies should focus on retaining and nurturing these high-value clients. Lastly, with a customer lifetime value (CLV) of **39,039.59**, the business can confidently allocate substantial resources toward acquiring new customers, knowing that each one has the potential to generate significant long-term returns.
 
 
