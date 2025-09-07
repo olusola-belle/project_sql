@@ -65,6 +65,50 @@ From the analysis, vintage cars and motorcycles sold more, since they sell frequ
 |1/72S72_3212 |ShipsPont | Yacht |
 
 Question 2: How should we match marketing and communication strategies  to customer behaviors?
+```sql
+-- Categorize the top five VIP customers
+WITH 
+
+customers_by_revenue AS (
+SELECT o.customerNumber, SUM(quantityOrdered * (priceEach - 
+       buyPrice)) AS revenue
+  FROM products p
+  JOIN orderdetails od
+    ON p.productCode = od.productCode
+  JOIN orders o
+    ON o.orderNumber = od.orderNumber
+ GROUP BY o.customerNumber
+)
+ 
+SELECT cr.profit, c.contactLastName, c.contactFirstName,c.city,c.country
+  FROM customers AS c
+  JOIN customers_by_revenue AS cr
+    ON c.customerNumber = cr.customerNumber
+ ORDER BY cr.profit DESC
+ LIMIT 5;
+
+ -- Categorize the top five least  customers
+WITH 
+
+customers_by_revenue AS (
+SELECT o.customerNumber, ROUND(SUM(quantityOrdered * (priceEach - 
+       buyPrice)) ,2) AS revenue
+  FROM products p
+  JOIN orderdetails od
+    ON p.productCode = od.productCode
+  JOIN orders o
+    ON o.orderNumber = od.orderNumber
+ GROUP BY o.customerNumber
+)
+ 
+SELECT c.contactLastName, c.contactFirstName, c.city,c.country, cr.revenue
+  FROM customers AS c
+  JOIN customers_by_revenue AS cr
+    ON c.customerNumber = cr.customerNumber
+ ORDER BY cr.revenue 
+ LIMIT 5;
+ ```
+
 To match the marketing and communication strategies to the customer behaviors, the customers were segmented into two : VIP customers and least engaged customers.
 
 **VIP Customers**  
@@ -87,6 +131,23 @@ To match the marketing and communication strategies to the customer behaviors, t
 |Labrune |Janine |Nantes |France |60875.3 |
 
 Question 3: How much can we spend on acquiring new customers?
+```sql
+-- Calculate the customer lifetime value
+WITH 
+customers_by_revenue AS (
+SELECT o.customerNumber, ROUND(SUM(quantityOrdered * (priceEach - 
+       buyPrice)) ,2) AS revenue
+  FROM products p
+  JOIN orderdetails od
+    ON p.productCode = od.productCode
+  JOIN orders o
+    ON o.orderNumber = od.orderNumber
+ GROUP BY o.customerNumber
+)
+
+SELECT AVG(revenue) AS lifetime_value
+  FROM customers_by_revenue;
+```
 |lifetime_value |
 |---|
 |39039.5943877551
